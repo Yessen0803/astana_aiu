@@ -1,0 +1,2 @@
+import Board from "@/components/Board";
+export default function Home() { return <main className="shell"><header className="topbar"><a href="/" className="brand"><span className="brand-mark">🥣</span><span>дәмді жоспар</span></a><span className="top-caption">Жоспарла · Сатып ал · Дәмді ас</span><a href="#planner" className="top-link">Мәзірім ↓</a></header><div id="planner"><Board /></div><footer className="footer"><span>© 2026 Дәмді жоспар · Ас мәзірің әрдайым қолыңда.</span><span><a href="/about">Жоба жайлы</a>　·　<a href="/privacy">Құпиялылық</a></span></footer></main>; }
