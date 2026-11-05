@@ -1,0 +1,26 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "HealthFlow: start local site",
+      "type": "shell",
+      "command": "$nodeRoot = Get-ChildItem \"$env:LOCALAPPDATA\\Microsoft\\WinGet\\Packages\\OpenJS.NodeJS.LTS_*\\node-v*-win-x64\" -Directory -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty FullName; if ($nodeRoot) { $env:Path = \"$nodeRoot;$env:Path\" }; $response = try { Invoke-WebRequest -Uri 'http://localhost:3001/' -TimeoutSec 2 -UseBasicParsing } catch { $null }; if ($response -and $response.StatusCode -eq 200) { Write-Host 'HealthFlow is already running at http://localhost:3001' } else { npm.cmd run dev -- --port 3001 }",
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "shell": {
+          "executable": "powershell.exe",
+          "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-Command"]
+        }
+      },
+      "runOptions": {
+        "runOn": "folderOpen",
+        "instanceLimit": 1
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "focus": false
+      }
+    }
+  ]
+}

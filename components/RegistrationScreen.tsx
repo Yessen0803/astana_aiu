@@ -5,7 +5,7 @@ import { t, type Locale, type Theme } from "@/lib/healthflow";
 
 type Registration = { name: string; email: string; city: string };
 
-export default function RegistrationScreen({ locale, theme, initialName, initialCity, onLocale, onTheme, onRegister, onContinueAsGuest }: {
+export default function RegistrationScreen({ locale, theme, initialName, initialCity, onLocale, onTheme, onRegister, onContinueAsGuest, onAdminDemo }: {
   locale: Locale;
   theme: Theme;
   initialName: string;
@@ -14,6 +14,7 @@ export default function RegistrationScreen({ locale, theme, initialName, initial
   onTheme: (theme: Theme) => void;
   onRegister: (registration: Registration) => void;
   onContinueAsGuest: () => void;
+  onAdminDemo: () => void;
 }) {
   const [name, setName] = useState(initialName);
   const [email, setEmail] = useState("");
@@ -44,6 +45,7 @@ export default function RegistrationScreen({ locale, theme, initialName, initial
         </form>
         <div className="registration-note"><span>🔒</span><p>{t(locale,"This prototype keeps profile details in this browser only. It does not create a server account.")}</p></div>
         <button type="button" className="text-button guest-button" onClick={onContinueAsGuest}>{t(locale,"Continue as a guest")}</button>
+        <button type="button" className="text-button guest-button admin-demo-button" onClick={onAdminDemo}>🔐 Admin demo · admin@healthflow.local</button>
       </section>
     </div>
     <footer className="registration-footer">© 2026 HealthFlow · {t(locale,"A little movement")}</footer>
