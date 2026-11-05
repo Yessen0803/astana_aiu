@@ -48,4 +48,21 @@
 .notification-page-card .status-chip{justify-self:start}
 .notification-page-card p{grid-column:1/-1;margin:10px 0 2px;color:var(--hf-ink);font-size:15px;line-height:1.7;white-space:pre-wrap}
 .notification-page-card time{grid-column:1/-1;color:var(--hf-muted);font-size:11px}
-@media(max-width:600px){.notification-page-card{padding:17px}}
+.friend-profile-page{display:grid;gap:14px}
+.friend-profile-page .profile-cover{overflow:visible}
+.friend-profile-page .profile-heading{padding-top:0}
+.friend-profile-page .profile-heading .status-chip{margin-left:auto}
+.friend-social-panel{display:grid;gap:12px}
+.friend-social-panel .panel-heading{margin-bottom:0}
+.friend-social-links{display:flex;flex-wrap:wrap;gap:9px}
+.friend-social-links a{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:9px 13px;border:1px solid var(--hf-line);border-radius:10px;background:var(--hf-soft);color:var(--hf-accent-dark);font-size:12px;font-weight:750;text-decoration:none}
+.friend-social-links a:hover{border-color:var(--hf-accent);background:var(--hf-card)}
+.friend-social-links p{margin:0;color:var(--hf-muted);font-size:12px}
+.friend-social-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding-top:12px;border-top:1px solid var(--hf-line)}
+.friend-social-form label{display:grid;gap:6px;color:var(--hf-muted);font-size:11px;font-weight:650}
+.friend-social-form input{width:100%;min-height:42px;padding:9px 11px;border:1px solid var(--hf-line);border-radius:9px;background:var(--hf-bg);color:var(--hf-ink);font:inherit;font-size:12px}
+.friend-social-form input:focus-visible{outline:3px solid #77ad8c66;outline-offset:2px}
+.friend-social-form>div{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.friend-social-form>div small,.friend-social-form>p{color:var(--hf-muted);font-size:10px}
+.friend-social-form>p{grid-column:1/-1;min-height:14px;margin:0}
+@media(max-width:600px){.notification-page-card{padding:17px}.friend-profile-page .profile-heading{align-items:flex-start;flex-wrap:wrap;gap:10px}.friend-profile-page .profile-heading .status-chip{margin-left:0}.friend-social-form{grid-template-columns:1fr}.friend-social-form>div{align-items:stretch;flex-direction:column}.friend-social-form>div .button{width:100%}}
