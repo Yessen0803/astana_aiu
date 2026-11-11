@@ -66,3 +66,44 @@
 .friend-social-form>div small,.friend-social-form>p{color:var(--hf-muted);font-size:10px}
 .friend-social-form>p{grid-column:1/-1;min-height:14px;margin:0}
 @media(max-width:600px){.notification-page-card{padding:17px}.friend-profile-page .profile-heading{align-items:flex-start;flex-wrap:wrap;gap:10px}.friend-profile-page .profile-heading .status-chip{margin-left:0}.friend-social-form{grid-template-columns:1fr}.friend-social-form>div{align-items:stretch;flex-direction:column}.friend-social-form>div .button{width:100%}}
+
+/* Social controls and recommendations */
+.profile-social{display:grid;gap:10px;margin-top:5px;padding:15px;border:1px solid var(--hf-line);border-radius:12px;background:var(--hf-bg)}
+.profile-social h3{margin:4px 0 0;font-size:14px}
+.profile-social label{display:grid;gap:6px;color:var(--hf-muted);font-size:10px;font-weight:700}
+.profile-social input{width:100%;min-height:40px;padding:9px 11px;border:1px solid var(--hf-line);border-radius:9px;background:var(--hf-card);color:var(--hf-ink);font:inherit;font-size:11px}
+.profile-social input::placeholder{color:var(--hf-muted);opacity:.8}
+.profile-social .button{justify-self:start}
+.community-tabs{display:flex;gap:7px;margin:0 0 13px;padding:4px;border:1px solid var(--hf-line);border-radius:11px;background:var(--hf-bg)}
+.community-tabs button{display:flex;align-items:center;gap:7px;min-height:36px;padding:7px 12px;border:0;border-radius:8px;background:transparent;color:var(--hf-muted);font-size:10px;font-weight:750}
+.community-tabs button.selected{background:var(--hf-card);color:var(--hf-accent-dark);box-shadow:0 1px 4px #00000012}
+.community-tabs button span{min-width:18px;padding:2px 5px;border-radius:20px;background:var(--hf-soft);text-align:center;font-size:8px}
+.sticker-toggle{flex:0 0 34px;width:34px;height:34px;border:1px solid var(--hf-line);border-radius:9px;background:var(--hf-bg);color:var(--hf-ink);font-size:17px}
+.sticker-toggle:hover,.sticker-picker button:hover{border-color:var(--hf-accent);background:var(--hf-soft)}
+.sticker-picker{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 2px;padding:9px;border:1px solid var(--hf-line);border-radius:10px;background:var(--hf-bg)}
+.sticker-picker button{width:36px;height:36px;border:1px solid transparent;border-radius:9px;background:var(--hf-card);font-size:19px}
+.community-empty{display:grid;justify-items:center;gap:7px;padding:28px 14px;border:1px dashed var(--hf-line);border-radius:12px;color:var(--hf-muted);text-align:center}
+.community-empty>span{font-size:27px}.community-empty b{color:var(--hf-ink);font-size:12px}.community-empty p{margin:0;font-size:10px}
+@media(max-width:600px){.community-tabs button{flex:1;justify-content:center;padding:7px 5px}.profile-social .button{width:100%}}
+
+/* Dark theme uses the same surface levels throughout every app section. */
+.theme-dark{color-scheme:dark;--hf-bg:#121212;--hf-card:#1a1a1a;--hf-ink:#f2f2f2;--hf-muted:#b0b0b0;--hf-line:#333333;--hf-soft:#242424;--hf-accent:#8fc6a0;--hf-accent-dark:#a8d6b4;--hf-shadow:0 12px 34px rgba(0,0,0,.32);--soft-line:#383838;--paper:#121212;--ink:#f2f2f2;--muted:#b0b0b0;--green:#8fc6a0;--green-dark:#a8d6b4;--mint:#242424;--line:#333333;--white:#1a1a1a;--shadow:0 12px 34px rgba(0,0,0,.32)}
+.registration-screen.theme-dark{--hf-bg:#121212;--hf-card:#1a1a1a;--hf-ink:#f2f2f2;--hf-muted:#b0b0b0;--hf-line:#333;--hf-soft:#242424;background:#121212}
+.theme-dark .sidebar,.theme-dark .app-topbar,.theme-dark .mobile-nav,.theme-dark .panel,.theme-dark .profile-cover,.theme-dark .profile-heading,.theme-dark .profile-stat,.theme-dark .post-card,.theme-dark .support-window,.theme-dark .booking-modal,.theme-dark .friend-detail,.theme-dark .friend-profile-modal,.theme-dark .admin-inbox-panel,.theme-dark .admin-posts-panel{background-color:#1a1a1a;color:#f2f2f2}
+.theme-dark .nav-item,.theme-dark .date-line,.theme-dark .field-label,.theme-dark .recipe-preview li,.theme-dark .recipe-preview li b,.theme-dark .grocery-list b,.theme-dark .grocery-progress>span{color:#d0d0d0}
+.theme-dark input,.theme-dark select,.theme-dark textarea,.theme-dark .recipe-select,.theme-dark .stepper button,.theme-dark .day-cell,.theme-dark .week-day,.theme-dark .mood-choice,.theme-dark .grocery-progress,.theme-dark .empty-day,.theme-dark .list-icon,.theme-dark .profile-social,.theme-dark .profile-social input,.theme-dark .post-composer,.theme-dark .post-composer textarea,.theme-dark .comment-form input,.theme-dark .sticker-toggle,.theme-dark .community-tabs,.theme-dark .community-empty,.theme-dark .filter,.theme-dark .button.secondary{background-color:#242424;color:#f2f2f2;border-color:#3a3a3a}
+.theme-dark .day-cell.selected,.theme-dark .day-cell.planned,.theme-dark .week-day.selected,.theme-dark .filter.active,.theme-dark .community-tabs button.selected{background:#303030;color:#fff}
+.theme-dark .day-cell:hover,.theme-dark .week-day:hover,.theme-dark .button.secondary:hover,.theme-dark .sticker-picker button:hover{background:#333;border-color:#555}
+.theme-dark .overview,.theme-dark .overview-icon,.theme-dark .grocery-note,.theme-dark .data-card,.theme-dark .care-check>span,.theme-dark .metric-tile,.theme-dark .stat-card,.theme-dark .achievement-card,.theme-dark .plan-library article,.theme-dark .planned-row,.theme-dark .wellness-check,.theme-dark .friend-card,.theme-dark .restaurant-card,.theme-dark .reservation-row,.theme-dark .admin-thread-select,.theme-dark .support-thread-message{background:#242424;color:#ededed;border-color:#3a3a3a}
+.theme-dark .overview span,.theme-dark .grocery-sub,.theme-dark .grocery-note,.theme-dark .grocery-empty p,.theme-dark .recipe-preview small,.theme-dark .comments p,.theme-dark .post-actions>span,.theme-dark .community-empty p,.theme-dark .profile-social label{color:#b0b0b0}
+.theme-dark .calendar-panel,.theme-dark .editor,.theme-dark .grocery-panel,.theme-dark .calorie-summary{background:#1a1a1a;color:#f2f2f2;border-color:#333;box-shadow:var(--hf-shadow)}
+.theme-dark .month-badge,.theme-dark .selected-place,.theme-dark .filter.active,.theme-dark .map-caption span,.theme-dark .map-caption b,.theme-dark .restaurant-note,.theme-dark .payment-note{background:#242424;color:#e6e6e6;border-color:#3a3a3a}
+.theme-dark .weekdays span,.theme-dark .day-number,.theme-dark .calendar-hint,.theme-dark .storage-note,.theme-dark .medical-note{color:#aaa}
+.theme-dark .recipe-select option{background:#242424;color:#f2f2f2}
+.theme-dark .servings-row,.theme-dark .grocery-list li,.theme-dark .post-actions{border-color:#383838}
+.theme-dark .profile-social input:focus-visible,.theme-dark input:focus-visible,.theme-dark select:focus-visible,.theme-dark textarea:focus-visible{outline-color:#8fc6a0}
+.theme-dark .community-tabs button{color:#b0b0b0}
+.theme-dark .community-tabs button.selected{color:#b7e1c1}
+.theme-dark .sticker-picker{background:#1a1a1a;border-color:#383838}
+.theme-dark .sticker-picker button{background:#242424;color:#fff}
+.theme-dark .profile-cover-art{background:linear-gradient(110deg,#262626,#303030 55%,#252525)}

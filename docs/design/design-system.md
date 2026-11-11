@@ -10,14 +10,14 @@ These values match the current app CSS (`app/healthflow.css`). Components should
 
 | Token | Light | Dark | Use |
 | --- | --- | --- | --- |
-| `--hf-bg` | `#f4f6f2` | `#0d1114` | Page background |
-| `--hf-card` | `#ffffff` | `#151b20` | Cards, menus, dialogs |
-| `--hf-ink` | `#1c2925` | `#eef3ef` | Primary text |
-| `--hf-muted` | `#7a8780` | `#a0aaa5` | Supporting text |
-| `--hf-line` | `#e6ebe5` | `#293238` | Borders and dividers |
-| `--hf-soft` | `#eef3ed` | `#1d2925` | Selected and quiet surfaces |
-| `--hf-accent` | `#4b8064` | `#80bd91` | Links, highlights, progress |
-| `--hf-accent-dark` | `#34634c` | `#91c69f` | Primary actions and focus |
+| `--hf-bg` | `#f4f6f2` | `#121212` | Page background |
+| `--hf-card` | `#ffffff` | `#1a1a1a` | Cards, menus, dialogs |
+| `--hf-ink` | `#1c2925` | `#f2f2f2` | Primary text |
+| `--hf-muted` | `#7a8780` | `#b0b0b0` | Supporting text |
+| `--hf-line` | `#e6ebe5` | `#333333` | Borders and dividers |
+| `--hf-soft` | `#eef3ed` | `#242424` | Selected and quiet surfaces |
+| `--hf-accent` | `#4b8064` | `#8fc6a0` | Links, highlights, progress |
+| `--hf-accent-dark` | `#34634c` | `#a8d6b4` | Primary actions and focus |
 
 Use semantic status colors in addition to an icon and text label: success `#2f7a4d`, warning `#9a6714`, and error `#b7474f`. Check contrast against both themes before shipping. Never communicate status by color alone.
 
@@ -41,10 +41,13 @@ The current implementation has compact 9–12 px text in several areas. New desi
 - Inputs and touch targets should be at least 40 px high; target 44 px for primary mobile controls.
 - A panel heading places its title and one related action together. Avoid multiple competing primary buttons in one panel.
 - Preserve the visible keyboard focus style. Dialogs must have a clear title, close action, and a sensible focus order.
+- Recommendation cards keep like, comment, and sticker actions together; feed tabs clearly separate recommendations from the signed-in user's posts.
+- Profile social links sit directly below the personal detail fields and use platform-specific URL placeholders.
 
 ## Theme and language behavior
 
 - Support light and dark themes with the same content hierarchy; theme changes must not alter saved data.
+- In dark theme, use `#121212` for the page canvas and `#1a1a1a` for primary cards across nutrition, profile, planning, and community; controls use a raised `#242424` surface with readable text.
 - Support Kazakh (`kk`), Russian (`ru`), and English (`en`). Keep layouts flexible for translated text and longer labels.
 - Format dates and numbers for the selected locale. Keep units visible (`қадам`, `г`, `ккал`, `сағ`).
 - Do not mix translated UI text with hard-coded labels in the same component.
