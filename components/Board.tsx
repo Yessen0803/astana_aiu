@@ -20,7 +20,7 @@ export default function Board({ locale, onMealPlanned }: { locale: Locale; onMea
     const previousMealId = plans[String(day)]?.[slot]?.recipeId;
     if (meal && meal.recipeId !== previousMealId) {
       const recipe = recipes.find((item) => item.id === meal.recipeId);
-      if (recipe) onMealPlanned?.({ name: t(locale, recipe.name), slot, day, month });
+      if (recipe) onMealPlanned?.({ name: recipe.names?.[locale] ?? t(locale, recipe.name), slot, day, month });
     }
     setPlans((current) => {
       const next = { ...current };
