@@ -9,7 +9,12 @@ import { t, type Locale } from "@/lib/healthflow";
 type Comment = { id: string; author: string; text: string };
 type Post = { id: string; author: string; caption: string; image?: string; createdAt: string; likes: string[]; comments: Comment[]; demo?: boolean; art?: string };
 const storageKey = "hf:posts";
-const stickers = ["🌿", "💪", "👏", "❤️", "✨", "🔥", "🤍", "🎉"];
+const stickers = [
+  { icon: "care", label: "Қолдау" }, { icon: "movement", label: "Күшті" },
+  { icon: "trophy", label: "Жарайсың" }, { icon: "heart", label: "Жүрек" },
+  { icon: "sun", label: "Керемет" }, { icon: "check", label: "Алға" },
+  { icon: "profile", label: "Сені қолдаймын" }, { icon: "community", label: "Біргеміз" },
+];
 const seedPosts: Post[] = recommendedPosts.map((post) => ({ ...post, demo: true }));
 function compress(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -76,7 +81,7 @@ export default function CommunityFeed({ locale, author }: { locale: Locale; auth
       <p className="post-caption">{post.caption}</p><div className="post-actions"><button className={post.likes.includes(author) ? "like-button liked" : "like-button"} type="button" onClick={() => toggleLike(post)} aria-pressed={post.likes.includes(author)}><AppIcon name={post.likes.includes(author) ? "♥" : "♡"}/> {t(locale, "Like")} · {post.likes.length}</button><span>{post.comments.length} пікір</span></div>
       {post.comments.length > 0 && <div className="comments">{post.comments.map((comment) => <p key={comment.id}><b>{comment.author}:</b> {comment.text}</p>)}</div>}
       <form className="comment-form" onSubmit={(event) => addComment(event, post)}><input value={drafts[post.id] || ""} onChange={(event) => setDrafts((current) => ({ ...current, [post.id]: event.target.value }))} placeholder={t(locale, "Write a comment…")} maxLength={240} aria-label={t(locale, "Write a comment…")}/><button className="sticker-toggle" type="button" aria-label={t(locale, "Send a sticker")} aria-expanded={stickerPost === post.id} onClick={() => setStickerPost(stickerPost === post.id ? null : post.id)}><AppIcon name="sticker"/></button><button className="button secondary small" type="submit">{t(locale, "Comment")}</button></form>
-      {stickerPost === post.id && <div className="sticker-picker" aria-label={t(locale, "Choose a sticker")}>{stickers.map((sticker) => <button type="button" key={sticker} aria-label={`${t(locale, "Send a sticker")} ${sticker}`} onClick={() => submitComment(post, sticker)}>{sticker}</button>)}</div>}
+      {stickerPost === post.id && <div className="sticker-picker" aria-label={t(locale, "Choose a sticker")}>{stickers.map((sticker) => <button type="button" key={sticker.label} aria-label={`${t(locale, "Send a sticker")} ${sticker.label}`} onClick={() => submitComment(post, sticker.label)}><AppIcon name={sticker.icon}/></button>)}</div>}
     </article>) : <div className="community-empty"><span><AppIcon name={tab === "mine" ? "camera" : "🌱"}/></span><b>{tab === "mine" ? t(locale, "No posts yet") : t(locale, "No recommendations yet")}</b><p>{tab === "mine" ? t(locale, "Share your first photo with the community.") : t(locale, "New community posts will appear here.")}</p></div>}</div>
   </section>;
 }

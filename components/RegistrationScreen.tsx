@@ -42,7 +42,7 @@ export default function RegistrationScreen({ locale, theme, initialName, initial
           <label>{t(locale,"Name")}<input autoComplete="name" value={name} onChange={(event) => setName(event.target.value)} maxLength={60} required/></label>
           <label>{t(locale,"Email")}<input type="email" autoComplete="email" placeholder="name@example.com" value={email} onChange={(event) => setEmail(event.target.value)} maxLength={120} required/></label>
           <label>{t(locale,"Choose a city")}<select value={city} onChange={(event) => setCity(event.target.value)}>{["Астана","Алматы","Шымкент","Қарағанды"].map((item) => <option key={item}>{item}</option>)}</select></label>
-          <button className="button primary full-width" type="submit">{t(locale,"Create profile")} <span>↗</span></button>
+          <button className="button primary full-width" type="submit">{t(locale,"Create profile")} <span>{<AppIcon name="↗"/>}</span></button>
         </form>
         <div className="registration-note"><span><AppIcon name="lock"/></span><p>{t(locale,"This prototype keeps profile details in this browser only. It does not create a server account.")}</p></div>
         <button type="button" className="text-button guest-button" onClick={onContinueAsGuest}>{t(locale,"Continue as a guest")}</button>
