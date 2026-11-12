@@ -2,7 +2,7 @@
 import {
   CgAdd, CgArrowLeft, CgArrowRight, CgBell, CgBowl, CgCalendarDates,
   CgCamera, CgChart, CgCheck, CgClose, CgCoffee, CgComment, CgCommunity,
-  CgDrop, CgGlass, CgGym, CgHeart, CgHome, CgIcecream, CgImage, CgLock, CgMail,
+  CgCloud, CgDrop, CgGlass, CgGym, CgHeart, CgHome, CgIcecream, CgImage, CgLock, CgMail,
   CgMenuCake, CgMenuCheese, CgMoon, CgOptions, CgPin, CgProfile,
   CgSearch, CgShield, CgShoppingCart, CgSmile, CgSun, CgSupport, CgTrees,
   CgTrophy, CgUserList, CgYinyang,
