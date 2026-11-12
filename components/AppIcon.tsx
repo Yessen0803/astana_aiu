@@ -4,7 +4,8 @@ import {
   CgCamera, CgChart, CgCheck, CgClose, CgCoffee, CgComment, CgCommunity,
   CgCloud, CgDrop, CgGlass, CgGym, CgHeart, CgHome, CgIcecream, CgImage, CgLock, CgMail,
   CgMenuCake, CgMenuCheese, CgMoon, CgOptions, CgPin, CgProfile,
-  CgSearch, CgShield, CgShoppingCart, CgSmile, CgSun, CgSupport, CgTrees,
+  CgSearch, CgShield, CgShoppingCart, CgSmile, CgSmileNeutral, CgSmileNone,
+  CgSmileSad, CgSmileUpside, CgSun, CgSupport, CgTrees,
   CgTrophy, CgUserList, CgYinyang,
 } from "react-icons/cg";
 import type { IconType } from "react-icons";
@@ -15,7 +16,10 @@ const icons: Record<string, IconType> = {
   bowl: CgBowl, nutrition: CgBowl, "◉": CgBowl, "🍚": CgBowl, "🥗": CgBowl, "🍲": CgBowl, "🍛": CgBowl, "🥘": CgBowl, "🍽️": CgBowl, "🍝": CgBowl, "🍜": CgBowl, "🥙": CgBowl, "🥩": CgBowl, "🐟": CgBowl, "🐠": CgBowl, "🍗": CgBowl, "🥒": CgBowl,
   "🍳": CgMenuCheese, "🥞": CgMenuCake, "🍰": CgMenuCake, "🍦": CgIcecream, "🫐": CgIcecream, "🍓": CgIcecream, "🥑": CgBowl, "🥛": CgCoffee,
   movement: CgGym, "↗": CgGym, "🏃": CgGym, "🚶": CgGym, "🏋️": CgGym, "💃": CgGym, workout: CgGym,
-  yoga: CgYinyang, "🧘": CgYinyang, care: CgHeart, "✿": CgHeart, "🌿": CgTrees, "🌱": CgTrees, "🌳": CgTrees, "🫧": CgCloud,
+  yoga: CgYinyang, "🧘": CgYinyang, care: CgHeart, breathe: CgCloud,
+  "✿": CgHeart, "🌿": CgTrees, "🌱": CgTrees, "🌳": CgTrees, "🫧": CgCloud,
+  "mood-good": CgSmileUpside, "mood-normal": CgSmile, "mood-neutral": CgSmileNeutral,
+  "mood-tired": CgSmileSad, "mood-hard": CgSmileNone,
   progress: CgChart, chart: CgChart, "⌁": CgChart, community: CgCommunity, "◎": CgCommunity, friends: CgUserList, "♧": CgUserList,
   restaurants: CgMenuCake, "✳": CgMenuCake, notifications: CgBell, "🔔": CgBell, profile: CgProfile, "👤": CgProfile,
   support: CgSupport, "✉": CgMail, "💬": CgComment, sticker: CgSmile, "😊": CgSmile,
