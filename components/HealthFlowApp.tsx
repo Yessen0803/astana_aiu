@@ -13,7 +13,7 @@ import { AdminView } from "@/components/sections/AdminSection";
 import { RestaurantView } from "@/components/sections/RestaurantSection";
 import { ProfileEditPage, ProfileView } from "@/components/sections/ProfileSection";
 import type { Activity, DayData, Friend, Habit, HealthNotification, Reservation, SupportMessage, SupportThread } from "@/lib/healthflow-types";
-import { defaultHabits, demoFriends, emptyDay, formatSleepDuration, initials, normalizeSocialLink, read, restaurants, save, sleepMinutes, todayKey, workoutLibrary } from "@/lib/healthflow-app";
+import { defaultHabits, demoFriends, emptyDay, formatSleepDuration, initials, normalizeSocialLink, read, restaurants, save, saveProfileData, sleepMinutes, todayKey, workoutLibrary } from "@/lib/healthflow-app";
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -177,13 +177,13 @@ export default function HealthFlowApp() {
   }
   function toggleHabit(id: string) { const next = day.completedHabits.includes(id) ? day.completedHabits.filter((item) => item !== id) : [...day.completedHabits, id]; updateDay({ completedHabits: next }); }
   function addHabit(event: FormEvent) { event.preventDefault(); const title = customHabit.trim(); if (!title) return; const next = [...habits, { id: `habit-${Date.now()}`, title, icon: "trophy" }]; setHabits(next); save("hf:habits", next); setCustomHabit(""); setToast("Әдет қосылды"); }
-  function saveProfile() { const ok = save("hf:profile", { name, bio, photo: profilePhoto, instagram, tiktok }); setToast(ok ? "Профиль сақталды" : "Сақтау орны толды"); }
+  function saveProfile() { const ok = saveProfileData({ name, bio, photo: profilePhoto, instagram, tiktok }); setToast(ok ? "Профиль сақталды" : "Сақтау орны толды"); }
   function saveSocialLinks() {
     const nextInstagram = normalizeSocialLink(instagram, "instagram.com");
     const nextTiktok = normalizeSocialLink(tiktok, "tiktok.com");
     if (nextInstagram === null || nextTiktok === null) { setToast(t(locale, "Enter valid Instagram and TikTok URLs")); return; }
     setInstagram(nextInstagram); setTiktok(nextTiktok);
-    const ok = save("hf:profile", { name, bio, photo: profilePhoto, instagram: nextInstagram, tiktok: nextTiktok });
+    const ok = saveProfileData({ name, bio, photo: profilePhoto, instagram: nextInstagram, tiktok: nextTiktok });
     setToast(ok ? t(locale, "Social links saved") : t(locale, "Storage is full"));
   }
   function registerProfile(registration: { name: string; email: string; city: string }) {
@@ -202,7 +202,7 @@ export default function HealthFlowApp() {
     for (let index = 0; index < localStorage.length; index++) { const key = localStorage.key(index); if (key?.startsWith("hf:") || key?.startsWith("as-menu:")) data[key] = localStorage.getItem(key); }
     const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: "application/json" })); const anchor = document.createElement("a"); anchor.href = url; anchor.download = "healthflow-data.json"; anchor.click(); URL.revokeObjectURL(url); setToast("Деректер жүктелді");
   }
-  function chooseProfilePhoto(file?: File) { if (!file) return; if (!file.type.startsWith("image/") || file.size > 12 * 1024 * 1024) { setToast("12 МБ-тан аспайтын суретті таңда"); return; } const reader = new FileReader(); reader.onerror = () => setToast("Суретті оқу мүмкін болмады"); reader.onload = () => { const image = new window.Image(); image.onerror = () => setToast("Бұл суретті ашу мүмкін болмады"); image.onload = () => { const scale = Math.min(1, 560 / Math.max(image.width, image.height)); const canvas = document.createElement("canvas"); canvas.width = Math.max(1, Math.round(image.width * scale)); canvas.height = Math.max(1, Math.round(image.height * scale)); canvas.getContext("2d")?.drawImage(image, 0, 0, canvas.width, canvas.height); let value = canvas.toDataURL("image/jpeg", 0.68); if (value.length > 450000) value = canvas.toDataURL("image/jpeg", 0.48); if (value.length > 550000) { setToast("Кішірек сурет таңдап көр"); return; } const ok = save("hf:profile", { name, bio, photo: value }); if (!ok) { setToast("Суретті сақтау орны жеткіліксіз"); return; } setProfilePhoto(value); setToast("Профиль суреті сақталды"); }; image.src = String(reader.result || ""); }; reader.readAsDataURL(file); }
+  function chooseProfilePhoto(file?: File) { if (!file) return; if (!file.type.startsWith("image/") || file.size > 12 * 1024 * 1024) { setToast("12 МБ-тан аспайтын суретті таңда"); return; } const reader = new FileReader(); reader.onerror = () => setToast("Суретті оқу мүмкін болмады"); reader.onload = () => { const image = new window.Image(); image.onerror = () => setToast("Бұл суретті ашу мүмкін болмады"); image.onload = () => { const scale = Math.min(1, 560 / Math.max(image.width, image.height)); const canvas = document.createElement("canvas"); canvas.width = Math.max(1, Math.round(image.width * scale)); canvas.height = Math.max(1, Math.round(image.height * scale)); canvas.getContext("2d")?.drawImage(image, 0, 0, canvas.width, canvas.height); let value = canvas.toDataURL("image/jpeg", 0.68); if (value.length > 450000) value = canvas.toDataURL("image/jpeg", 0.48); if (value.length > 550000) { setToast("Кішірек сурет таңдап көр"); return; } const ok = saveProfileData({ photo: value }); if (!ok) { setToast("Суретті сақтау орны жеткіліксіз"); return; } setProfilePhoto(value); setToast("Профиль суреті сақталды"); }; image.src = String(reader.result || ""); }; reader.readAsDataURL(file); }
   function addFriend(event: FormEvent) { event.preventDefault(); const query = friendQuery.trim(); if (!query) return; if (friends.some((item) => item.name.toLocaleLowerCase() === query.toLocaleLowerCase())) { setToast("Бұл дос тізімде бар"); return; } const next = [{ id: `friend-${Date.now()}`, name: query, city, bio: "HealthFlow қауымдастығының мүшесі", sessions: 0, points: 0, color: "#b8c4e8" }, ...friends]; setFriends(next); save("hf:friends", next); setFriendQuery(""); setToast("Дос жергілікті тізімге қосылды"); }
   function saveFriendSocialLinks(id: string, values: { instagram: string; tiktok: string }) {
     const instagram = normalizeSocialLink(values.instagram, "instagram.com");

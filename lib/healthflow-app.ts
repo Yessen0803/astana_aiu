@@ -26,6 +26,10 @@ export const todayKey = () => localDayKey(new Date());
 export const emptyDay = (): DayData => ({ steps: 0, water: 0, completedHabits: [], planned: [], done: [], mood: "", sleepStart: "22:30", sleepEnd: "07:00", careDone: [], note: "" });
 export function read<T>(key: string, fallback: T): T { try { const value = localStorage.getItem(key); return value ? JSON.parse(value) as T : fallback; } catch { return fallback; } }
 export function save(key: string, value: unknown) { try { localStorage.setItem(key, JSON.stringify(value)); return true; } catch { return false; } }
+export type ProfileData = { name?: string; bio?: string; photo?: string; instagram?: string; tiktok?: string };
+export function saveProfileData(patch: ProfileData) {
+  return save("hf:profile", { ...read<ProfileData>("hf:profile", {}), ...patch });
+}
 export function initials(name: string) { return name.trim().split(/\s+/).slice(0, 2).map((part) => [...part][0] ?? "").join("").toUpperCase() || "Е"; }
 export function normalizeSocialLink(value: string, host: "instagram.com" | "tiktok.com"): string | null {
   const input = value.trim();
