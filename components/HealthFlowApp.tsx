@@ -129,8 +129,8 @@ export default function HealthFlowApp() {
     const isReturning = Boolean(localStorage.getItem("hf:welcome-date"));
     localStorage.setItem("hf:welcome-date", today);
     const nextItems: HealthNotification[] = [
-      { id: `welcome-${today}`, title: isReturning ? t(locale, "Welcome back") : t(locale, "Welcome to HealthFlow"), message: `${name} · ${t(locale, "Your wellness space is ready.")}`, icon: "🌿", createdAt: new Date().toISOString(), read: false },
-      { id: `tip-${today}`, title: t(locale, "A gentle reminder"), message: t(locale, "Log your steps, water, and sleep to see your daily rhythm."), icon: "💧", createdAt: new Date().toISOString(), read: false },
+      { id: `welcome-${today}`, title: isReturning ? t(locale, "Welcome back") : t(locale, "Welcome to HealthFlow"), message: `${name} · ${t(locale, "Your wellness space is ready.")}`, icon: "trees", createdAt: new Date().toISOString(), read: false },
+      { id: `tip-${today}`, title: t(locale, "A gentle reminder"), message: t(locale, "Log your steps, water, and sleep to see your daily rhythm."), icon: "water", createdAt: new Date().toISOString(), read: false },
     ];
     setNotifications((current) => { const updated = [...nextItems, ...current].slice(0, 40); save("hf:notifications", updated); return updated; });
     setToast(`${t(locale, isReturning ? "Welcome back" : "Welcome to HealthFlow")}, ${name}!`);
