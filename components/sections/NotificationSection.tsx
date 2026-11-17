@@ -1,0 +1,13 @@
+import AppIcon from "@/components/AppIcon";
+import { PageIntro } from "@/components/sections/PageIntro";
+import type { HealthNotification } from "@/lib/healthflow-types";
+import { formatDate, t, type Locale } from "@/lib/healthflow";
+
+export function NotificationsView({ locale, notifications, onOpen, onClear }: { locale:Locale; notifications:HealthNotification[]; onOpen:(item:HealthNotification)=>void; onClear:()=>void }) {
+  const readMessages = notifications.filter((item) => item.read);
+  return <><PageIntro eyebrow={t(locale,"Notifications")} title={t(locale,"Notifications")} subtitle={t(locale,"Read messages are kept here. Unread messages appear in the bell above.")}/><section className="panel notifications-page"><div className="notifications-page-header"><div><span className="eyebrow">{t(locale,"Read messages")}</span><h2>{readMessages.length} · {t(locale,"Read messages")}</h2></div>{readMessages.length > 0 && <button className="text-button danger" onClick={onClear}>{t(locale,"Clear all")}</button>}</div>{readMessages.length ? <div className="notifications-page-list">{readMessages.map((item) => <button key={item.id} className="notification-item read" onClick={() => onOpen(item)} aria-label={`${item.title}. ${t(locale,"Read notification")}. ${item.message}`}><span><AppIcon name={item.icon}/></span><span><b>{item.title}</b><small>{item.message}</small><time>{new Date(item.createdAt).toLocaleString(locale === "kk" ? "kk-KZ" : locale === "ru" ? "ru-RU" : "en-US",{dateStyle:"medium",timeStyle:"short"})}</time></span><span className="notification-state"><AppIcon name="check"/> {t(locale,"Read notification")}</span></button>)}</div> : <div className="notifications-empty page-empty"><AppIcon name="notifications"/><b>{t(locale,"No read messages")}</b><small>{t(locale,"Read notifications will appear here after you open them from the bell.")}</small></div>}</section></>;
+}
+
+export function NotificationDetailPage({ locale, notification, onBack }: { locale:Locale; notification:HealthNotification; onBack:()=>void }) {
+  return <><button className="text-button detail-page-back" onClick={onBack}>← {t(locale,"Back to app")}</button><PageIntro eyebrow={t(locale,"Notifications")} title={notification.title} subtitle={t(locale,"Notification message")}/><section className="panel notification-page-card"><span className="notification-detail-icon">{notification.icon}</span><span className="status-chip">✓ {t(locale,"Read notification")}</span><p>{notification.message}</p><time>{new Date(notification.createdAt).toLocaleString(locale === "kk" ? "kk-KZ" : locale === "ru" ? "ru-RU" : "en-US",{dateStyle:"full",timeStyle:"short"})}</time></section></>;
+}
