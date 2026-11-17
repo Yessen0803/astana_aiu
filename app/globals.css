@@ -19,3 +19,6 @@
 .hf-water-settings strong{font-size:8px;white-space:nowrap}
 .hf-water-disclaimer{margin:7px 0 0;text-align:center;color:#9aa39c;font-size:7px}
 .hf-week-tag{padding:5px 8px;border-radius:7px;background:#f6f7f3;color:#849087;font-size:8px}
+/* Compact standalone informational pages and legacy meal planner spacing. */
+.page-content{min-height:0;padding-block:28px}
+.planner{padding-block:24px 14px}
