@@ -3,7 +3,7 @@ import {
   CgCalendarDates, CgCamera, CgChart, CgCheck, CgClose, CgCloud,
   CgCoffee, CgComment, CgCommunity, CgDrop, CgGlass, CgGym, CgHeart,
   CgHome, CgImage, CgLock, CgMail, CgMenuCheese, CgMoon,
-  CgOptions, CgPen, CgPin, CgProfile, CgSearch, CgShield, CgShoppingCart,
+  CgCopy, CgFlag, CgOptions, CgPen, CgPin, CgProfile, CgSearch, CgShoppingCart,
   CgSmile, CgSmileNeutral, CgSmileNone, CgSmileSad, CgSmileUpside, CgSun,
   CgSupport, CgTrees, CgTrophy, CgUserList, CgYinyang,
 } from "react-icons/cg";
@@ -19,7 +19,8 @@ const icons: Record<string, IconType> = {
   notifications: CgBell, profile: CgProfile, support: CgSupport, comment: CgComment,
   sticker: CgSmile, "mood-good": CgSmileUpside, "mood-normal": CgSmile,
   "mood-neutral": CgSmileNeutral, "mood-tired": CgSmileSad, "mood-hard": CgSmileNone,
-  admin: CgOptions, settings: CgOptions, edit: CgPen, pencil: CgPen,
+  admin: CgOptions, settings: CgOptions, options: CgOptions, edit: CgPen, pencil: CgPen,
+  copy: CgCopy, flag: CgFlag, send: CgArrowTopRight,
   lock: CgLock, water: CgDrop, moon: CgMoon, sleep: CgMoon, sun: CgSun,
   check: CgCheck, trophy: CgTrophy, streak: CgTrophy, camera: CgCamera,
   image: CgImage, pin: CgPin, search: CgSearch, add: CgAdd, close: CgClose,
