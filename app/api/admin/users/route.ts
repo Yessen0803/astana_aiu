@@ -20,14 +20,21 @@ async function getAdminContext() {
   return { supabase, user } as const;
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   const context = await getAdminContext();
   if ("response" in context) return context.response;
 
-  const { data, error } = await context.supabase
+  const requestedRole = new URL(request.url).searchParams.get("role");
+  if (requestedRole && !["user", "moderator", "admin"].includes(requestedRole)) {
+    return Response.json({ error: "Role filter is invalid." }, { status: 400 });
+  }
+
+  let query = context.supabase
     .from("profiles")
     .select("id,display_name,city,role,created_at")
     .order("created_at", { ascending: false });
+  if (requestedRole) query = query.eq("role", requestedRole);
+  const { data, error } = await query;
   if (error) return Response.json({ error: "Could not load users." }, { status: 500 });
 
   return Response.json(
