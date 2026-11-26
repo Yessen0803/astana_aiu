@@ -12,6 +12,19 @@ import { recommendedPosts } from "@/data/community";
 type AdminPost = { id: string; author: string; caption: string; createdAt: string; image?: string; art?: string; demo?: boolean; likes?: string[]; comments?: unknown[] };
 type AdminReport = { id: string; postId: string; postAuthor: string; reporter: string; reason: string; details: string; createdAt: string };
 type AdminRole = "user" | "moderator" | "admin";
+export type AdminPageId = "overview" | "reports" | "bookings" | "posts" | "support" | "users" | "roles" | "announcements" | "settings" | "audit";
+export const adminNavigation: { id: AdminPageId; icon: string; label: string }[] = [
+  { id: "overview", icon: "home", label: "Admin dashboard" },
+  { id: "reports", icon: "flag", label: "Manage reports" },
+  { id: "users", icon: "friends", label: "Manage users" },
+  { id: "bookings", icon: "restaurants", label: "Bookings" },
+  { id: "posts", icon: "community", label: "Community posts" },
+  { id: "support", icon: "support", label: "Support inbox" },
+  { id: "roles", icon: "settings", label: "Manage user roles" },
+  { id: "announcements", icon: "notifications", label: "Announcements" },
+  { id: "settings", icon: "settings", label: "Application settings" },
+  { id: "audit", icon: "chart", label: "Audit log" },
+];
 type AdminPerson = { id: string; name: string; email?: string; city?: string; role: AdminRole };
 type AdminSettings = { stepGoal: number; waterGoal: number; communityEnabled: boolean };
 type AdminLog = { id: string; action: string; actor: string; createdAt: string };
@@ -23,12 +36,12 @@ const auditKey = "hf:admin-audit";
 const defaultSettings: AdminSettings = { stepGoal: 8000, waterGoal: 2000, communityEnabled: true };
 function makeAdminLog(action: string, actor: string): AdminLog { const createdAt = new Date().toISOString(); return { id: `admin-${Date.now()}`, action, actor, createdAt }; }
 
-export function AdminView({ locale, email, name, threads, reservations, onReply, onReservationStatus, onBroadcast, onExport, onSettingsSave }: { locale: Locale; email: string; name: string; threads: SupportThread[]; reservations: Reservation[]; onReply: (threadId: string, text: string) => void; onReservationStatus: (id: string, status: "accepted" | "rejected") => void; onBroadcast: (title: string, message: string) => void; onExport: () => void; onSettingsSave: (settings: AdminSettings) => void }) {
+export function AdminView({ locale, email, name, page, threads, reservations, onReply, onReservationStatus, onBroadcast, onExport, onSettingsSave }: { locale: Locale; email: string; name: string; page: AdminPageId; threads: SupportThread[]; reservations: Reservation[]; onReply: (threadId: string, text: string) => void; onReservationStatus: (id: string, status: "accepted" | "rejected") => void; onBroadcast: (title: string, message: string) => void; onExport: () => void; onSettingsSave: (settings: AdminSettings) => void }) {
   const [posts, setPosts] = useState<AdminPost[]>([]);
   const [reports, setReports] = useState<AdminReport[]>([]);
   const [selectedThread, setSelectedThread] = useState("");
   const [reply, setReply] = useState("");
-  const [tab, setTab] = useState<"support" | "posts" | "reports" | "bookings" | "roles" | "users" | "announcements" | "settings" | "audit">("reports");
+  const tab = page;
   const [roles, setRoles] = useState<Record<string, AdminRole>>({});
   const [databasePeople, setDatabasePeople] = useState<AdminPerson[] | null>(null);
   const [currentDatabaseUserId, setCurrentDatabaseUserId] = useState("");
@@ -62,13 +75,13 @@ export function AdminView({ locale, email, name, threads, reservations, onReply,
       setRoles((current) => ({ ...current, ...Object.fromEntries(loaded.map((user) => [user.id, user.role])) }));
     }).catch(() => {});
   }, []);
-  const activeThread = threads.find((thread) => thread.id === selectedThread) ?? threads[0];
   const people: AdminPerson[] = databasePeople ?? [{ id: email || "current-user", name: name || t(locale, "User"), email: email || t(locale, "Guest user"), role: "admin" }, ...read<Friend[]>("hf:friends", demoFriends).map((friend) => ({ id: `friend:${friend.id}`, name: friend.name, email: t(locale, "Community member"), role: "user" as const }))];
   const visiblePeople = people.filter((person) => {
     const query = userSearch.trim().toLocaleLowerCase();
     const matchesSearch = !query || `${person.name} ${person.email || ""} ${person.city || ""}`.toLocaleLowerCase().includes(query);
     return matchesSearch && (userRoleFilter === "all" || person.role === userRoleFilter);
   });
+  const activeThread = threads.find((thread) => thread.id === selectedThread) ?? threads[0];
   function logAction(action: string) {
     const next = [makeAdminLog(action, name || email), ...audit].slice(0, 100);
     setAudit(next); save(auditKey, next);
@@ -121,12 +134,10 @@ export function AdminView({ locale, email, name, threads, reservations, onReply,
   const post = (id: string) => posts.find((item) => item.id === id);
   const isDemoAccount = email.endsWith("@healthflow.local") || !email;
 
-  return <><PageIntro eyebrow={t(locale, "ADMIN")} title={t(locale, "Admin dashboard")} subtitle={t(locale, "Manage local demo content and review community posts.")}/>
-    <section className="admin-account-card"><span className="admin-shield"><AppIcon name="settings"/></span><div><b>{t(locale, isDemoAccount ? "Demo administrator" : "Supabase administrator")}</b><small>{email} · {t(locale, isDemoAccount ? "Local demo only — this is not protected by server authentication." : "Signed in through Supabase authentication.")}</small></div><span className="status-chip">{t(locale, "Administrator")}</span></section>
-    <div className="stats-grid admin-stats"><article className="stat-card"><span><AppIcon name="community"/> {t(locale, "Community posts")}</span><b>{posts.length}</b><small>{t(locale, "saved in this browser")}</small></article><article className="stat-card"><span><AppIcon name="friends"/> {t(locale, "Users")}</span><b>{people.length}</b><small>{t(locale, "local profiles")}</small></article><article className="stat-card"><span><AppIcon name="flag"/> {t(locale, "Pending reports")}</span><b>{reports.length}</b><small>{t(locale, "reported posts")}</small></article><article className="stat-card"><span><AppIcon name="shopping"/> {t(locale, "Bookings")}</span><b>{reservations.length}</b><small>{t(locale, "saved in this browser")}</small></article><article className="stat-card"><span><AppIcon name="movement"/> {t(locale, "Total activities")}</span><b>{read<{id:string}[]>("hf:activity-log", []).length}</b><small>{t(locale, "saved in this browser")}</small></article><article className="stat-card"><span><AppIcon name="support"/> {t(locale, "Support conversations")}</span><b>{threads.length}</b><small>{t(locale, "local profiles")}</small></article></div>
-    <nav className="admin-feature-tabs" aria-label={t(locale, "Admin sections")}>
-      {([ ["reports", "Reports", reports.length], ["bookings", "Bookings", reservations.length], ["posts", "Community posts", posts.length], ["support", "Support inbox", threads.length], ["users", "Users", people.length], ["roles", "Manage user roles", people.length], ["announcements", "Announcements", 0], ["settings", "Application settings", 0], ["audit", "Audit log", audit.length] ] as const).map(([key, label, count]) => <button key={key} type="button" className={tab === key ? "selected" : ""} aria-pressed={tab === key} onClick={() => { setTab(key); setAnnouncementSent(false); }}>{t(locale, label)} <span>{count}</span></button>)}
-    </nav>
+  const pageTitle: Record<AdminPageId, string> = { overview: "Admin dashboard", reports: "Manage reports", bookings: "Bookings", posts: "Community posts", support: "Support inbox", users: "Manage users", roles: "Manage user roles", announcements: "Announcements", settings: "Application settings", audit: "Audit log" };
+  return <><PageIntro eyebrow={t(locale, "ADMIN")} title={t(locale, pageTitle[page])} subtitle={page === "overview" ? t(locale, "Manage local demo content and review community posts.") : ""}/>
+    {page === "overview" && <><section className="admin-account-card"><span className="admin-shield"><AppIcon name="settings"/></span><div><b>{t(locale, isDemoAccount ? "Demo administrator" : "Supabase administrator")}</b><small>{email} · {t(locale, isDemoAccount ? "Local demo only — this is not protected by server authentication." : "Signed in through Supabase authentication.")}</small></div><span className="status-chip">{t(locale, "Administrator")}</span></section>
+    <div className="stats-grid admin-stats"><article className="stat-card"><span><AppIcon name="community"/> {t(locale, "Community posts")}</span><b>{posts.length}</b><small>{t(locale, "saved in this browser")}</small></article><article className="stat-card"><span><AppIcon name="friends"/> {t(locale, "Users")}</span><b>{people.length}</b><small>{t(locale, "local profiles")}</small></article><article className="stat-card"><span><AppIcon name="flag"/> {t(locale, "Pending reports")}</span><b>{reports.length}</b><small>{t(locale, "reported posts")}</small></article><article className="stat-card"><span><AppIcon name="shopping"/> {t(locale, "Bookings")}</span><b>{reservations.length}</b><small>{t(locale, "saved in this browser")}</small></article><article className="stat-card"><span><AppIcon name="movement"/> {t(locale, "Total activities")}</span><b>{read<{id:string}[]>("hf:activity-log", []).length}</b><small>{t(locale, "saved in this browser")}</small></article><article className="stat-card"><span><AppIcon name="support"/> {t(locale, "Support conversations")}</span><b>{threads.length}</b><small>{t(locale, "local profiles")}</small></article></div></>}
 
     {tab === "users" && <section className="panel admin-roles-panel"><div className="panel-heading"><div><span className="eyebrow">{t(locale, "Access")}</span><h2>{t(locale, "Manage users")}</h2><p>{databasePeople ? t(locale, "Users are loaded from the connected database.") : t(locale, "This is the local demo list. Sign in with a Supabase administrator account to load registered users.")}</p></div><span className="count-pill">{visiblePeople.length} / {people.length}</span></div><div className="admin-user-filters"><label><span>{t(locale, "Search users")}</span><input type="search" value={userSearch} onChange={(event) => setUserSearch(event.target.value)} placeholder={t(locale, "Name, email, or city")}/></label><label><span>{t(locale, "Filter by role")}</span><select value={userRoleFilter} onChange={(event) => setUserRoleFilter(event.target.value as "all" | AdminRole)}><option value="all">{t(locale, "All roles")}</option><option value="user">{t(locale, "User")}</option><option value="moderator">{t(locale, "Moderator")}</option><option value="admin">{t(locale, "Administrator")}</option></select></label></div><div className="admin-user-list">{visiblePeople.length ? visiblePeople.map((person) => { const restricted = userStatuses[person.id] === "restricted"; const current = databasePeople ? person.id === currentDatabaseUserId : person.id === (email || "current-user"); return <article className="admin-user-row" key={person.id}><div className="admin-user-avatar"><AppIcon name="profile"/></div><div className="admin-user-info"><b>{person.name}{current && <span className="count-pill">{t(locale, "Current account")}</span>}</b><small>{person.email || `ID: ${person.id.slice(0, 8)}…`}{person.city ? ` · ${person.city}` : ""}</small></div><span className={`status-chip ${restricted ? "booking-status rejected" : "booking-status accepted"}`}>{t(locale, restricted ? "Restricted" : "Active")}</span><button className={`button ${restricted ? "secondary" : "danger"}`} type="button" disabled={current || Boolean(databasePeople)} onClick={() => toggleRestriction(person.id)}>{t(locale, restricted ? "Remove restriction" : "Set restriction")}</button></article>; }) : <div className="empty-state"><b>{t(locale, "No users match these filters")}</b></div>}</div></section>}
 
