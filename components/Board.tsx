@@ -9,13 +9,40 @@ import { mealSlots, recipes, type MealPlan, type MealSlot, type MonthPlan } from
 import { readChecked, readPlan, writeChecked, writePlan } from "@/lib/storage";
 import { t, type Locale } from "@/lib/healthflow";
 
-export default function Board({ locale, onMealPlanned }: { locale: Locale; onMealPlanned?: (meal: { name: string; slot: MealSlot; day: number; month: string }) => void }) {
+export default function Board({ locale, onMealPlanned, onPlanChange }: { locale: Locale; onMealPlanned?: (meal: { name: string; slot: MealSlot; day: number; month: string }) => void; onPlanChange?: (plan: { date: string; slot: MealSlot; meal?: MealPlan }) => void }) {
   const [month, setMonth] = useState("2026-10");
   const [day, setDay] = useState(1);
   const [plans, setPlans] = useState<MonthPlan>({});
   const [checked, setChecked] = useState<string[]>([]);
   const [calorieGoal, setCalorieGoal] = useState(2000);
   useEffect(() => { const now = new Date(); const current = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`; setMonth(current); setDay(now.getDate()); setPlans(readPlan(current)); setChecked(readChecked(current)); const savedGoal = Number(localStorage.getItem("as-menu:kcal-target")); if (Number.isFinite(savedGoal) && savedGoal >= 500 && savedGoal <= 6000) setCalorieGoal(savedGoal); }, []);
+  useEffect(() => {
+    let cancelled = false;
+    void fetch(`/api/meal-plan?month=${encodeURIComponent(month)}`, { cache: "no-store" }).then(async (response) => {
+      if (!response.ok) return;
+      const result = await response.json() as { meals?: Array<{ plan_date: string; meal_slot: MealSlot; recipe_id: string; servings: number }> };
+      if (cancelled) return;
+      const local = readPlan(month);
+      const remote: MonthPlan = {};
+      for (const item of result.meals || []) {
+        const date = new Date(`${item.plan_date}T00:00:00`);
+        if (!Number.isFinite(date.getTime()) || !mealSlots.some((slot) => slot.id === item.meal_slot) || !recipes.some((recipe) => recipe.id === item.recipe_id)) continue;
+        const dayKey = String(date.getDate());
+        remote[dayKey] = { ...(remote[dayKey] || {}), [item.meal_slot]: { recipeId: item.recipe_id, servings: item.servings } };
+      }
+      const merged: MonthPlan = { ...local };
+      for (const [dayKey, meals] of Object.entries(remote)) merged[dayKey] = { ...(merged[dayKey] || {}), ...meals };
+      setPlans(merged);
+      writePlan(month, merged);
+      for (const [dayKey, meals] of Object.entries(local)) {
+        for (const slot of mealSlots) {
+          const meal = meals[slot.id];
+          if (meal && !remote[dayKey]?.[slot.id]) onPlanChange?.({ date: `${month}-${String(dayKey).padStart(2, "0")}`, slot: slot.id, meal });
+        }
+      }
+    }).catch(() => {});
+    return () => { cancelled = true; };
+  }, [month, onPlanChange]);
   function changeMonth(value: string) { setMonth(value); setDay(1); setPlans(readPlan(value)); setChecked(readChecked(value)); }
   function setMeal(slot: MealSlot, meal?: MealPlan) {
     const previousMealId = plans[String(day)]?.[slot]?.recipeId;
@@ -33,6 +60,7 @@ export default function Board({ locale, onMealPlanned }: { locale: Locale; onMea
       writePlan(month, next);
       return next;
     });
+    onPlanChange?.({ date: `${month}-${String(day).padStart(2, "0")}`, slot, meal });
   }
   const groceries = useMemo(() => {
     const amounts = new Map<string, { name: string; unit: string; amount: number }>();
@@ -66,7 +94,7 @@ export default function Board({ locale, onMealPlanned }: { locale: Locale; onMea
     <section className="calorie-summary"><div><span className="eyebrow">{t(locale,"Selected day calories")}</span><strong>{selectedKcal.toLocaleString()} <small>kcal</small></strong><p>{selectedKcal > calorieGoal ? t(locale,"Above your daily target") : t(locale,"Planned calories for this day")}</p></div><div className="calorie-meter"><span><i style={{ width: `${Math.min(100, selectedKcal / calorieGoal * 100)}%` }}/></span><small>{selectedKcal.toLocaleString()} / {calorieGoal.toLocaleString()} kcal · {t(locale,"Month total")}: {plannedKcal.toLocaleString()} kcal</small></div><label>{t(locale,"Daily calorie target")}<input type="number" min={500} max={6000} step={50} value={calorieGoal} onChange={(event) => changeCalorieGoal(Number(event.target.value))}/></label></section>
     <div className="planner-layout"><div className="left-column"><section className="calendar-panel"><div className="panel-title"><div><span className="eyebrow">{t(locale,"Calendar")}</span><h2>{t(locale,"Daily menu")}</h2></div><span className="calendar-hint">{t(locale,"Choose a day and select a meal")}</span></div><RequestCard month={month} locale={locale} plans={plans} recipes={recipes} selected={day} onSelect={setDay} /><div className="legend"><span><i className="legend-selected"/> {t(locale,"Selected day")}</span><span><i className="legend-planned"/> {t(locale,"Meal planned")}</span></div></section>{mealSlots.map((slot) => <RequestComposer key={slot.id} locale={locale} day={day} slot={slot} plan={plans[String(day)]?.[slot.id]} recipes={recipes} onChange={(meal) => setMeal(slot.id, meal)} onRemove={() => setMeal(slot.id)} />)}</div>
     <aside className="grocery-panel"><div className="panel-title"><div><span className="eyebrow">{t(locale,"Monthly list")}</span><h2>{t(locale,"Shopping list")}</h2></div><span className="list-icon"><AppIcon name="shopping"/></span></div><p className="grocery-sub">{t(locale,"For all planned meals")}</p>{groceries.length ? <><div className="grocery-progress"><span>{checkedCount} / {groceries.length} {checkedText}</span><div><i style={{ width: `${groceries.length ? Math.min(100, checkedCount / groceries.length * 100) : 0}%` }}/></div></div><ul className="grocery-list">{groceries.map((item) => <li key={item.id} className={checked.includes(item.id) ? "bought" : ""}><label><input type="checkbox" checked={checked.includes(item.id)} onChange={() => toggleGrocery(item.id)} /><span>{t(locale,item.name)}</span></label><b>{formatAmount(item.amount, item.unit)}</b></li>)}</ul><p className="grocery-note"><AppIcon name="check"/> {t(locale,"Same ingredients are combined into total amounts.")}</p></> : <div className="grocery-empty"><span><AppIcon name="shopping"/></span><strong>{t(locale,"Your list is empty")}</strong><p>{t(locale,"Choose a day and plan a meal to see its ingredients here.")}</p></div>}</aside></div>
-    <p className="storage-note"><AppIcon name="lock"/> {t(locale,"Your menu is saved in this browser on this device.")}</p>
+    <p className="storage-note"><AppIcon name="lock"/> {locale === "kk" ? "Мәзір осы құрылғыда сақталады және Supabase аккаунтына кіргенде синхрондалады." : locale === "ru" ? "Меню сохраняется на устройстве и синхронизируется с Supabase после входа в аккаунт." : "The menu is saved on this device and syncs with Supabase when signed in."}</p>
   </section>;
 }
 
