@@ -164,14 +164,54 @@ HealthFlow осы бағыттарды ортақ күнтізбеде бірі�
 
 ## Технология және әзірлеу бағыты
 
-Қазіргі репозиторийдегі жобаның негізгі технологиясы — **Next.js**. Төмендегі құрылым — дамытудың ұсынылатын бағыты; нақты тәуелділіктер мен іске қосу командалары кодқа сәйкес толтырылуы керек.
+Қолданба **Next.js**, **Supabase Auth** және **Supabase Postgres** пайдаланады. Supabase жобасының кілттері `.env.local` ішінде беріледі; құпия кілт репозиторийге қосылмайды.
 
 - **Frontend:** Next.js және React негізіндегі адаптивті веб-интерфейс.
 - **Деректер моделі:** қолданушы профилі, мақсаттар, күнтізбелік жоспар, рецепт, жаттығу, әдет және прогресс жазбалары.
-- **Сақтау:** алғашқы прототипте браузердің жергілікті сақтау орны; кейін қажет болса серверлік API және дерекқор.
+- **Сақтау:** тіркелген қолданушының профилі мен күндік қадам/су/ұйқы жазбалары Supabase дерекқорына сервер API арқылы синхрондалады. Қонақ режимі мен офлайн интерфейс жергілікті сақтауды қолдана береді.
 - **Қолжетімділік:** телефонға бейімделген беттер, түсінікті бос күй, пернетақтамен басқару және оқуға ыңғайлы контраст.
 - **Локализация:** интерфейс қазақша, орысша және ағылшынша қолданылады.
-- **Backend:** `app/api/health/route.ts` және `lib/server/contracts.ts` — бастапқы API негізі. Тіркелу, серверлік аккаунт, дерекқор және рұқсат тексеру әлі іске асырылмаған.
+- **Backend:** `app/api/profile/route.ts` және `app/api/daily-log/route.ts` профиль мен күндік деректерге арналған қорғалған API береді. `app/api/health/route.ts` қызмет күйін көрсетеді.
+- **Дерекқор қауіпсіздігі:** `supabase/migrations/202611250001_healthflow.sql` кестелерді, тіркелу триггерін, индекстерді және Row Level Security (RLS) саясаттарын жасайды.
+
+### Supabase-ті баптау және көрсету
+
+1. [Supabase](https://supabase.com/dashboard) сайтында жаңа жоба ашыңыз. Жоба ішінде **SQL Editor → New query** ашып, `supabase/migrations/202611250001_healthflow.sql` файлының мазмұнын қойып, **Run** басыңыз.
+2. Жоба панелінен **Project URL** мен **Publishable key** мәндерін алыңыз. Репозиторийдің түбіріндегі `.env.example` файлын `.env.local` деп көшіріп, мәндерін толтырыңыз:
+
+   ```env
+   NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_...
+   ```
+
+3. **Authentication → URL Configuration** ішінде Site URL-ді `http://localhost:3001` етіп, Redirect URLs тізіміне `http://localhost:3001/auth/confirm` қосыңыз. Email провайдері қосулы болсын. Email confirmation қосулы болса, **Authentication → Email Templates → Confirm signup** сілтемесін мына үлгіге сәйкестендіріңіз:
+
+   ```text
+   {{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email
+   ```
+
+4. `.env.local` сақтағаннан кейін даму серверін қайта іске қосыңыз. PowerShell-де:
+
+   ```powershell
+   npm.cmd install --package-lock=false
+   npm.cmd run dev -- --port 3001
+   ```
+
+5. Тіркелу бетінде email, құпиясөз, аты және қаланы енгізіп аккаунт ашыңыз. Email confirmation қосулы болса, поштаны растағаннан кейін жүйеге кіріңіз. Тест кезінде растау хаты қолайсыз болса, оны тек демонстрацияға арналған Supabase жобасында уақытша өшіруге болады.
+
+**Әкімші рөлін беру:** жаңа қолданушы тіркелгеннен кейін Supabase **SQL Editor** ішінде өз email-ін қойып, рөлін дерекқордың өзінен орнатыңыз. Қолданушы браузер арқылы өзіне әкімші рөлін бере алмайды.
+
+```sql
+update public.profiles
+set role = 'admin'
+where id = (select id from auth.users where email = 'student@example.com');
+```
+
+Сызбадағы негізгі кестелер: `profiles`, `daily_logs`, `activity_logs`, `meal_entries`, `reservations`, `community_posts`, `post_comments`, `post_likes`, `post_reports`, `notifications`, `support_messages`, `friend_connections`. Қолданушының жеке кестелерінде RLS әр жолды тек иесіне көрсетеді; модерацияға арналған әкімші саясаттары да бар.
+
+API-ді браузерден тексеру: `GET /api/health`, `GET /api/profile`, `PUT /api/profile`, `GET /api/daily-log?date=YYYY-MM-DD`, `PUT /api/daily-log`. Профиль мен күндік дерек route handler ішінде расталған Supabase қолданушысы арқылы өңделеді. SQL Editor мен Table Editor арқылы оқытушы схеманы, RLS саясаттарын және тіркелген демо жазбаларды көре алады.
+
+Қазіргі интерфейстегі кейбір басқа бөлімдер әлі осы құрылғыдағы localStorage-ты пайдаланады. Миграция барлық бөлімнің frontend байланысын бірден Supabase-ке көшірмейді. Сыныпта көрсету үшін нақты медициналық/сезімтал мәлімет емес, ойдан алынған демо ақпарат қолданыңыз.
 
 ### Жергілікті нұсқаны іске қосу
 
@@ -196,7 +236,7 @@ npm run dev
 | Адам, рөл | VS Code-та қарайтын немесе жасайтын файлдар |
 |---|---|
 | **Yessen0803 — Frontend** | `app/page.tsx`, `components/HealthFlowApp.tsx`, интерфейс компоненттері, `data/requests.ts` және `app/healthflow.css` |
-| **balorazkyzy — Backend** | `app/api/`, `lib/server/` және `docs/api-contract.md`; алдымен API келісімін нақтылау, кейін дерекқор мен авторизацияны қосу |
+| **balorazkyzy — Backend** | `app/api/profile/`, `app/api/daily-log/`, `app/auth/confirm/`, `lib/supabase/`, `proxy.ts` және `supabase/migrations/` — Supabase авторизациясы, API route-тары, SQL кестелері мен RLS саясаттары |
 | **adilzhanbbb-star — UI/UX** | Figma сценарийлері және `docs/design/` ішіндегі дизайн жүйесі, түстер, қаріптер, бос/қате/сәтті экран күйлері |
 | **Dina680340 — Project manager** | `README.md`, GitHub Issues/Projects және [`docs/acceptance-criteria.md`](docs/acceptance-criteria.md) — міндеттер, жоспар және қабылдау шарттары |
 
